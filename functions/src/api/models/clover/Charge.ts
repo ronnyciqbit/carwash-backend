@@ -22,13 +22,29 @@ export default class Charge implements ChargeProperties {
 
   static async create(payment: Charge) {
     try {
-      await axios.post("https://scl.clover.com/v1/charges", payment, {
-        headers: {
-          Authorization: `Bearer ${CLOVER_ECOMMERCE_PRIVATE_TOKEN}`,
+      await axios.post(
+        "https://scl.clover.com/v1/charges",
+        {
+          ecomind: "ecom",
+          metadata: {
+            existingDebtIndicator: false,
+          },
+          source: payment.source,
+          amount: payment.amount,
+          currency: payment.currency,
         },
-      });
-    } catch (error) {
-      logger.error("'Charge.create' failed");
+        {
+          headers: {
+            Authorization: `Bearer ${CLOVER_ECOMMERCE_PRIVATE_TOKEN}`,
+          },
+        }
+      );
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      logger.error(
+        "'Charge.create' failed, (stringified):",
+        JSON.stringify(error)
+      );
       throw error;
     }
   }
